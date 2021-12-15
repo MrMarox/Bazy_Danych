@@ -71,12 +71,27 @@ right join uczestnicy u ON w.id_wyprawy=u.id_wyprawy
 right join kreatura k on u.id_uczestnika=k.idKreatury
 group by k.nazwa;
 
+#Zadanie 4.1
+select w.nazwa, sum(length(ew.dziennik))  from wyprawa w 
+inner join etapy_wyprawy ew on ew.idWyprawy=w.id_wyprawy
+group by w.nazwa having sum(length(ew.dziennik))<400;
+
 #Zadanie 4.2 
-select idEtapu, idWyprawy, lenght(dziennik) from etapy_wyprawy;
+SELECT  u.id_Wyprawy, (sum(z.waga*e.ilosc)/count(distinct u.id_uczestnika)) as 'srednia waga zasobow' FROM uczestnicy u
+left join ekwipunek e on u.id_uczestnika=e.idKreatury
+left join zasob z on z.idZasobu=e.idZasobu group by u.id_wyprawy;
 
+SELECT  u.id_wyprawy, sum(e.ilosc*z.waga)/count(distinct u.id_uczestnika) FROM uczestnicy u
+left join ekwipunek e on u.id_uczestnika=e.idKreatury
+left join zasob z on z.idZasobu=e.idZasobu group by u.id_wyprawy;
 
+#Zadanie 5
 
-
+SELECT k.nazwa, datediff(w.data_rozpoczecia, k.dataUr)as 'ile ma dni' from kreatura k
+inner join uczestnicy u on k.idKreatury=u.id_uczestnika
+inner join wyprawa w on u.id_wyprawy=w.id_wyprawy
+inner join etapy_wyprawy ew on w.id_wyprawy=ew.idWyprawy
+inner join sektor s on ew.sektor=s.id_sektora where s.nazwa='chatka dziadka';
 
 
 
@@ -121,3 +136,38 @@ SELECT k.rodzaj, sum(e.ilosc),avg(z.waga) FROM kreatura k
 inner join ekwipunek e on k.idKreatury=e.idKreatury
 inner join zasob z on e.idZasobu=z.idZasobu
 where k.rodzaj not in('malpa','waz') and e.ilosc < 30 group by k.rodzaj;
+
+show databases;
+use __firma_zti;
+show tables;
+
+#Zadanie 1
+
+SELECT p.imie, p.nazwisko, d.nazwa from pracownik p inner join dzial d ON p.dzial=d.id_dzialu;
+
+#Zadanie 2
+
+SELECT t.nazwa_towaru ,k.nazwa_kategori, s.ilosc from towar t
+inner join kategoria k ON t.kategoria=k.id_kategori
+inner join stan_magazynowy s on t.id_towaru=s.towar order by s.ilosc desc;
+
+#Zadanie 3
+
+select z.id_zamowienia, s.nazwa_statusu_zamowienia from zamowienie z
+inner join status_zamowienia s on s.id_statusu_zamowienia=z.status_zamowienia 
+where s.nazwa_statusu_zamowienia = "anulowane";
+
+#Zadanie 4
+
+select k.id_klienta, a.miejscowosc from klient k
+inner join adres_klienta a on k.id_klienta=a.klient
+inner join typ_adresu t on t.id_typu=a.typ_adresu where a.miejscowosc="olsztyn" and t.nazwa = "podstawowy";
+
+
+#Zadanie 5
+
+select * from stan_magazynowy;
+select * from jednostka_miary;
+
+select * from stan_magazynowy s
+right join jednostka_miary j on s.jm=j.id_jednostki where towar is null;
