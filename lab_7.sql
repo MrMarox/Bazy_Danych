@@ -171,3 +171,80 @@ select * from jednostka_miary;
 
 select * from stan_magazynowy s
 right join jednostka_miary j on s.jm=j.id_jednostki where towar is null;
+
+use __firma_zti
+
+#zadanie 6 
+
+SELECT z.numer_zamowienia, t.nazwa_towaru, p.ilosc, p.cena from zamowienie z 
+inner join pozycja_zamowienia p ON z.id_zamowienia=p.zamowienie 
+inner join towar t on t.id_towaru=p.towar where year(z.data_zamowienia)='2018';
+
+#zadanie 7
+create table towary_full_info as
+select
+  towar.nazwa_towaru,
+  towar.cena_zakupu,
+  kategoria.kategoria,
+  stan_magazynowy.ilosc,
+  jednostka_miary.nazwa as jednostka_miary
+from
+  towar
+  join kategoria on towar.kategoria = kategoria.id_kategori
+  join stan_magazynowy on towar.id_towaru = stan_magazynowy.towar
+  join jednostka_miary on stan_magazynowy.jm = jednostka_miary.id_jednostki;
+  
+#zadnaie 8
+select * from pozycja_zamowienia;
+
+select p.id_pozycji, z.data_zamowienia from zamowienie z inner join pozycja_zamowienia p on z.id_zamowienia=p.zamowienie order by data_zamowienia asc limit 5
+
+#zadanie 10
+
+SELECT * frpm adres_klienta where kod regexp '^1'; #rozpoczyna od 1 
+SELECT * from adres_klienta where kod not like '__-___';
+SELECT * from adres_klienta where kod not like '[0-9]{2}-[0-9]{3}';
+
+ #zadanie 9
+ select * from zamowienie z join status_zamowienia s where s.nazwa_statusu_zamowienia != 'zrealizowane';
+select z.numer_zamowienia, s.nazwa_statusu_zamowienia from zamowienie z inner join status_zamowienia s ON z.status_zamowienia=s.id_statusu_zamowienia where s.nazwa_statusu_zamowienia != 'zrealizowane';
+
+
+
+
+#zadanie 1
+SELECT imie,nazwisko,YEAR(data_urodzenia)  from pracownik;
+
+#zadanie 2
+SELECT imie,nazwisko,YEAR(CURRENT_DATE())-YEAR(data_urodzenia)  from pracownik;
+
+#zadanie 3
+
+SELECT d.nazwa, count(id_pracownika) from pracownik p inner join dzial d on d.id_dzialu=p.dzial group by d.nazwa
+
+#zadanie 4
+
+SELECT k.nazwa_kategori, count(t.id_towaru) from towar t inner join kategoria k on k.id_kategori=t.kategoria group by k.nazwa_kategori;
+
+#zadanie 5 
+
+SELECT k.nazwa_kategori, group_concat(t.nazwa_towaru separator ' | ')  from towar t inner join kategoria k on k.id_kategori=t.kategoria group by k.nazwa_kategori;
+
+#zadanie 6
+
+select round(avg(pensja),2) from pracownik;
+
+#zadanie 7
+
+select round(avg(pensja)) from pracownik where (Year(current_date())-year(data_zatrudnienia))>'5';
+
+#zadanie 8
+
+SELECT t.nazwa_towaru, count(p.zamowienie) from pozycja_zamowienia p inner join towar t on p.towar=t.id_towaru group by t.nazwa_towaru order by count(p.zamowienie) desc limit 10;
+#zadanie 9 
+
+select z.numer_zamowienia, sum(p.ilosc*p.cena) from zamowienie z join pozycja_zamowienia p on z.id_zamowienia=p.zamowienie where z.data_zamowienia between 01-01-2017 and 03-31-2017 group by z.numer_zamowienia;
+
+#zadanie 10 
+
+SELECT p.imie,p.nazwisko,sum(po.ilosc*po.cena) from pracownik p inner join zamowienie z on z.pracownik_id_pracownika=p.id_pracownika inner join pozycja_zamowienia po on z.id_zamowienia=po.zamowienie group by p.id_pracownika order by sum(po.ilosc*po.cena) desc;
